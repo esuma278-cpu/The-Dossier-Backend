@@ -4,8 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "investigation_cases")
 public class Case {
 
     @Id
@@ -17,7 +22,14 @@ public class Case {
     private String difficulty;
     private String status;
 
+    private LocalDateTime createdAt;
+
     public Case() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -58,5 +70,9 @@ public class Case {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

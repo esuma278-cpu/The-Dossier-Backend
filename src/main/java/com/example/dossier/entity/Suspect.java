@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 public class Suspect {
@@ -16,6 +18,10 @@ public class Suspect {
     private String description;
     private String occupation;
     private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "case_id")
+    private Case investigationCase;
 
     public Suspect() {
     }
@@ -58,5 +64,13 @@ public class Suspect {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Case getInvestigationCase() {
+        return investigationCase;
+    }
+
+    public void setInvestigationCase(Case investigationCase) {
+        this.investigationCase = investigationCase;
     }
 }

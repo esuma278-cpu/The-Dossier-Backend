@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 public class Timeline {
@@ -15,6 +17,10 @@ public class Timeline {
     private String eventTitle;
     private String eventDescription;
     private String eventDate;
+
+    @ManyToOne
+    @JoinColumn(name = "case_id")
+    private Case investigationCase;
 
     public Timeline() {
     }
@@ -49,5 +55,13 @@ public class Timeline {
 
     public void setEventDate(String eventDate) {
         this.eventDate = eventDate;
+    }
+
+    public Case getInvestigationCase() {
+        return investigationCase;
+    }
+
+    public void setInvestigationCase(Case investigationCase) {
+        this.investigationCase = investigationCase;
     }
 }

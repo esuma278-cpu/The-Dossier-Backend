@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 public class Evidence {
@@ -16,6 +18,10 @@ public class Evidence {
     private String description;
     private String type;
     private String fileUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "case_id")
+    private Case investigationCase;
 
     public Evidence() {
     }
@@ -58,5 +64,13 @@ public class Evidence {
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+
+    public Case getInvestigationCase() {
+        return investigationCase;
+    }
+
+    public void setInvestigationCase(Case investigationCase) {
+        this.investigationCase = investigationCase;
     }
 }
