@@ -11,7 +11,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://the-dossier-front-end.vercel.app"
+})
 public class UserController {
 
     private final UserService userService;
