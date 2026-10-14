@@ -11,10 +11,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "https://the-dossier-front-end.vercel.app"
-})
 public class UserController {
 
     private final UserService userService;
@@ -25,15 +21,20 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
+        User registeredUser;
+        try {
+            registeredUser = userService.registerUser(user);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("message", exception.getMessage())
+            );
+        }
 
         return ResponseEntity.ok(Map.of(
                 "message", "Registration successful",
                 "username", registeredUser.getUsername(),
                 "email", registeredUser.getEmail(),
-                "role", registeredUser.getRole() == null
-                        ? "INVESTIGATOR"
-                        : registeredUser.getRole()
+                "role", registeredUser.getRole()
         ));
     }
 

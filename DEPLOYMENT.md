@@ -1,24 +1,30 @@
-# Backend deployment
+# Deploying The Dossier
 
-## Render and Aiven
+The frontend and backend are separate GitHub repositories. Render hosts the
+Spring Boot API and PostgreSQL database; Vercel hosts the React frontend.
 
-1. Create an Aiven MySQL service and database. Allow connections from Render in
-   the Aiven service's networking settings.
-2. In Render, create a Blueprint using this backend repository. Render reads
-   `render.yaml` and builds the service with the included Dockerfile.
-3. Set the three prompted environment variables on the Render service:
-   - `SPRING_DATASOURCE_URL`: `jdbc:mysql://<AIVEN_HOST>:<AIVEN_PORT>/<DATABASE>?sslMode=REQUIRED`
-   - `SPRING_DATASOURCE_USERNAME`: the Aiven database username
-   - `SPRING_DATASOURCE_PASSWORD`: the Aiven database password
-4. Deploy the service. Spring Boot binds to the port provided by Render.
+## Render
 
-Do not commit database credentials. The datasource properties default to a
-local MySQL instance for development and use Render's environment variables in
-production.
+1. Create or update a Blueprint from the backend repository root. Render reads
+   `render.yaml` and provisions the free `dossier-api` web service and
+   `dossier-db` PostgreSQL database in Singapore.
+2. Confirm the Blueprint creates both services. The database is configured for
+   testing; review its expiration and retention in the Render dashboard and
+   export any data you need before it expires.
+3. The Blueprint connects the API to PostgreSQL and sets the `render` Spring
+   profile. It allows the existing frontend origin
+   `https://the-dossier-front-end.vercel.app`; update
+   `APP_CORS_ALLOWED_ORIGINS` on the API if Vercel assigns a different domain.
+4. The API health check is available at `/health`.
 
-## Frontend
+## Vercel
 
-Set `REACT_APP_API_BASE_URL` in the frontend hosting provider to the deployed
-Render service URL, with no trailing slash (for example,
-`https://dossier-api.onrender.com`). The Vercel frontend origin is allowed by
-the user API's CORS configuration.
+1. Import the frontend repository. Its root already contains the React app
+   and `vercel.json`.
+2. Set `REACT_APP_API_BASE_URL` to the deployed Render API URL, without a
+   trailing slash (for example, `https://dossier-api.onrender.com`).
+3. Deploy or redeploy the frontend so the API URL is included in its build.
+
+Local MySQL settings remain available for development. The Render profile uses
+the managed PostgreSQL database; existing MySQL records are not copied
+automatically.

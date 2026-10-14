@@ -1,14 +1,42 @@
+databases:
+  - name: dossier-db
+    databaseName: dossier
+    user: dossier
+    plan: free
+    region: singapore
+    postgresMajorVersion: "16"
+
 services:
   - type: web
     name: dossier-api
     runtime: docker
     plan: free
+    region: singapore
     dockerfilePath: ./Dockerfile
     dockerContext: .
+    healthCheckPath: /health
     envVars:
-      - key: SPRING_DATASOURCE_URL
-        sync: false
-      - key: SPRING_DATASOURCE_USERNAME
-        sync: false
-      - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: APP_CORS_ALLOWED_ORIGINS
+        value: https://the-dossier-front-end.vercel.app
+      - key: DB_HOST
+        fromDatabase:
+          name: dossier-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: dossier-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: dossier-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: dossier-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: dossier-db
+          property: password
