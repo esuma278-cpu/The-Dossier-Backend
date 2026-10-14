@@ -2,6 +2,8 @@ package com.example.dossier.controller;
 
 import com.example.dossier.entity.Investigation;
 import com.example.dossier.service.InvestigationService;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,9 +23,21 @@ public class InvestigationController {
     }
 
     @PostMapping
-    public Investigation submitInvestigation(
-            @RequestBody Investigation investigation) {
-        return investigationService.submitInvestigation(investigation);
+    public InvestigationSubmissionResponse submitInvestigation(
+            @Valid @RequestBody InvestigationSubmissionRequest request,
+            Authentication authentication) {
+        Investigation saved = investigationService.submitInvestigation(
+                request.theory(),
+                request.caseId(),
+                authentication.getName()
+        );
+        return new InvestigationSubmissionResponse(
+                saved.getId(),
+                saved.getTheory(),
+                saved.getStatus(),
+                saved.getSubmittedAt(),
+                saved.getInvestigationCase().getId()
+        );
     }
 
     @GetMapping

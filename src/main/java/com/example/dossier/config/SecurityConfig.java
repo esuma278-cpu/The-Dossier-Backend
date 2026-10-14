@@ -3,7 +3,12 @@ package com.example.dossier.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +21,12 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtService jwtService) {
+        this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,8 +64,26 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(
+                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
+                )
+            )
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/users/register", "/api/users/login", "/health")
+                    .permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/investigations")
+                    .hasRole("INVESTIGATOR")
                 .anyRequest().permitAll()
+            )
+            .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();

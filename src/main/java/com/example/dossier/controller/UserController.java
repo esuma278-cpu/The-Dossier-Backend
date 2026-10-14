@@ -2,6 +2,7 @@ package com.example.dossier.controller;
 
 import com.example.dossier.entity.User;
 import com.example.dossier.service.UserService;
+import com.example.dossier.config.JwtService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +15,11 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -56,13 +59,15 @@ public class UserController {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            String role = user.getRole() == null
+                    ? "INVESTIGATOR"
+                    : user.getRole();
 
             return ResponseEntity.ok(Map.of(
                     "message", "Login successful",
                     "username", user.getUsername(),
-                    "role", user.getRole() == null
-                            ? "INVESTIGATOR"
-                            : user.getRole()
+                    "role", role,
+                    "token", jwtService.generateToken(user, role)
             ));
         }
 

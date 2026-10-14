@@ -16,6 +16,10 @@ Spring Boot API and PostgreSQL database; Vercel hosts the React frontend.
    `https://the-dossier-front-end.vercel.app`; update
    `APP_CORS_ALLOWED_ORIGINS` on the API if Vercel assigns a different domain.
 4. The API health check is available at `/health`.
+5. Set `JWT_SECRET` on the Render API service to a securely generated random
+   value of at least 32 bytes. Set the same variable in the local backend
+   environment when running outside Render. Login tokens expire after eight
+   hours.
 
 ## Vercel
 
